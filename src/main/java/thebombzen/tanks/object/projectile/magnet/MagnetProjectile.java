@@ -30,6 +30,11 @@ public abstract class MagnetProjectile extends Projectile {
 				oldPosition));
 		setFrozen(true);
 	}
+	
+	@Override
+	protected void onImpactWithProjectile(Projectile projectile){
+		
+	}
 
 	@Override
 	public void onLeaveTerrain(Vector oldPosition, Vector newPosition) {
@@ -39,6 +44,10 @@ public abstract class MagnetProjectile extends Projectile {
 	@Override
 	public void onMoveOffScreen() {
 
+	}
+	
+	public void onTickInTerrain(Vector oldPosition, Vector newPosition){
+		setFrozen(true);
 	}
 
 }

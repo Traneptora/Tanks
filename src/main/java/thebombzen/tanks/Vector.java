@@ -14,7 +14,7 @@ public class Vector {
 		long raw = Double.doubleToRawLongBits(x);
 		raw = 0x5fe6eb50c7b537a9L - (raw >>> 1);
 		double y = Double.longBitsToDouble(raw);
-		y *= 1.5F - 0.5F * x * y * y;
+		y *= 1.5D - 0.5D * x * y * y;
 		return y;
 	}
 
@@ -22,8 +22,8 @@ public class Vector {
 		return new Vector(r * Math.cos(theta), r * Math.sin(theta));
 	}
 
-	private double x;
-	private double y;
+	private final double x;
+	private final double y;
 
 	public Vector(double x, double y) {
 		this.x = x;
@@ -75,11 +75,11 @@ public class Vector {
 	}
 
 	public int getIntegerX() {
-		return (int) x;
+		return (int)Math.round(x);
 	}
 
 	public int getIntegerY() {
-		return (int) y;
+		return (int)Math.round(y);
 	}
 
 	public double getInverseNorm() {

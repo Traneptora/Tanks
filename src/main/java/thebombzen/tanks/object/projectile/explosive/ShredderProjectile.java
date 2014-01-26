@@ -14,5 +14,11 @@ public class ShredderProjectile extends ExplosiveProjectile {
 		Terrain.getTerrain().setTerrainAroundRadius(getPosition(),
 				(int) (2D * getRadius()), false);
 	}
+	
+	@Override
+	public void onTickInTerrain(Vector oldPosition, Vector newPosition) {
+		Terrain.getTerrain().setTerrainAroundRadius(getPosition(),
+				(int) (2D * getRadius()), false);
+	}
 
 }

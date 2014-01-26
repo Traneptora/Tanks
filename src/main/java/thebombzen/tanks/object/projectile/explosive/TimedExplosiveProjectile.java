@@ -30,13 +30,35 @@ public class TimedExplosiveProjectile extends ExplosiveProjectile {
 
 	@Override
 	public void onEnterTerrain(Vector oldPosition, Vector newPosition) {
+		if (getVelocity().getNormSquared() <= 1D){
+			setFrozen(true);
+			return;
+		}
 		setPosition(Terrain.getTerrain().getOuterImpactLocation(newPosition,
 				oldPosition));
 		Vector normal = Terrain.getTerrain().getSurfaceNormalVector(
 				getPosition());
 		Vector normalComponent = getVelocity().getComponent(normal);
-		setVelocity(getVelocity().subtract(normalComponent.multiply(2.0D))
-				.multiply(0.5D));
+		setVelocity(getVelocity().subtract(normalComponent.multiply(2.0D)).multiply(0.625D));
+	}
+	
+	@Override
+	public void onTickInTerrain(Vector oldPosition, Vector newPosition) {
+		if (getVelocity().getNormSquared() <= 1D){
+			setFrozen(true);
+			return;
+		}
+		setPosition(Terrain.getTerrain().getOuterImpactLocation(newPosition,
+				oldPosition));
+		Vector normal = Terrain.getTerrain().getSurfaceNormalVector(
+				getPosition());
+		Vector normalComponent = getVelocity().getComponent(normal);
+		setVelocity(getVelocity().subtract(normalComponent.multiply(2.0D)).multiply(0.625D));
+	}
+	
+	@Override
+	public boolean isBlocking(){
+		return true;
 	}
 
 }

@@ -97,8 +97,7 @@ public class Tank implements Moving, Positioned, Renderable, Advanceable {
 
 	protected void destroy() {
 		World.getWorld().addObject(
-				new Explosion(getPosition(), 150D, 1D, RenderHelper
-						.getInverse(getColor())));
+				new Explosion(getPosition(), 150D, 1D, getColor()));
 	}
 
 	@Override
@@ -213,10 +212,16 @@ public class Tank implements Moving, Positioned, Renderable, Advanceable {
 
 	@Override
 	public void onEnterTerrain(Vector oldPosition, Vector newPosition) {
+		//setPosition(oldPosition);
+		//setFrozen(true);
+	}
+	
+	@Override
+	public void onTickInTerrain(Vector oldPosition, Vector newPosition) {
+		//Vector displacement = newPosition.subtract(oldPosition);
 		setVelocity(Vector.ZERO);
-		setFrozen(true);
-		// setPosition(Terrain.getTerrain().getInnerImpactLocation(newPosition,
-		// oldPosition));
+		Vector outerLocation = Terrain.getTerrain().getOuterImpactLocation(newPosition, oldPosition);
+		setPosition(outerLocation);
 	}
 
 	protected void onImpactWithExplosion(Explosion ex) {

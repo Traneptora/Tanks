@@ -15,6 +15,13 @@ public class LandMineProjectile extends ExplosiveProjectile {
 				oldPosition));
 		setFrozen(true);
 	}
+	
+	@Override
+	public void onTickInTerrain(Vector oldPosition, Vector newPosition) {
+		setPosition(Terrain.getTerrain().getInnerImpactLocation(newPosition,
+				oldPosition));
+		setFrozen(true);
+	}
 
 	@Override
 	public void onLeaveTerrain(Vector oldPosition, Vector newPosition) {

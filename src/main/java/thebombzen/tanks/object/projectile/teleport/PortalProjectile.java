@@ -33,6 +33,10 @@ public class PortalProjectile extends Projectile {
 	public void onEnterTerrain(Vector oldPosition, Vector newPosition) {
 		destroyAndKill();
 	}
+	
+	public void onTickInTerrain(Vector oldPosition, Vector newPosition){
+		destroyAndKill();
+	}
 
 	@Override
 	public void onLeaveTerrain(Vector oldPosition, Vector newPosition) {

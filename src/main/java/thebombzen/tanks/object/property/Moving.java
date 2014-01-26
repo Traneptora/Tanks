@@ -31,6 +31,7 @@ public interface Moving extends Positioned {
 	public boolean isFrozen();
 
 	public void onEnterTerrain(Vector oldPosition, Vector newPosition);
+	public void onTickInTerrain(Vector oldPosition, Vector newPosition);
 
 	public void onLeaveTerrain(Vector oldPosition, Vector newPosition);
 

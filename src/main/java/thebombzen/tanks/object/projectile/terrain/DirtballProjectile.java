@@ -25,6 +25,10 @@ public class DirtballProjectile extends Projectile {
 	public double getMagnetMultiplier() {
 		return 0;
 	}
+	
+	public void onTickInTerrain(Vector oldPosition, Vector newPosition) {
+		destroyAndKill();
+	}
 
 	@Override
 	public void onEnterTerrain(Vector oldPosition, Vector newPosition) {

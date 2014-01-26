@@ -67,5 +67,9 @@ public class DebrisProjectile extends Projectile {
 				+ ", getVelocity()=" + getVelocity() + ", getMass()="
 				+ getMass() + "]";
 	}
+	
+	public void onTickInTerrain(Vector oldPosition, Vector newPosition) {
+		destroyAndKill();
+	}
 
 }

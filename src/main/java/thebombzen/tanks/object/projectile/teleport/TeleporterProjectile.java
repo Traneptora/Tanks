@@ -40,6 +40,12 @@ public class TeleporterProjectile extends Projectile {
 				newPosition, oldPosition));
 		setDead();
 	}
+	
+	public void onTickInTerrain(Vector oldPosition, Vector newPosition) {
+		parentTank.setPosition(Terrain.getTerrain().getOuterImpactLocation(
+				newPosition, oldPosition));
+		setDead();
+	}
 
 	@Override
 	public void onLeaveTerrain(Vector oldPosition, Vector newPosition) {

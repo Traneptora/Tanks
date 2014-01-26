@@ -71,8 +71,8 @@ public class GamePanel extends Canvas implements MouseListener {
 		Renderable[] renderables = World.getWorld().getAllRenderables();
 		Arrays.sort(renderables, RenderSorter.getRenderSorter());
 		for (Renderable renderable : renderables) {
-			RenderHelper.setAntialias(renderGraphics, true);
 			renderable.render(renderGraphics);
+			RenderHelper.setAntialias(renderGraphics, true);
 		}
 
 		Graphics graphics = getGraphics();

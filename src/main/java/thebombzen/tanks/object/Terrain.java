@@ -52,7 +52,7 @@ public class Terrain implements Renderable {
 		}
 		if (!doesTerrainExistAt(insidePosition)
 				&& !doesTerrainExistAt(outsidePosition)) {
-			return outsidePosition;
+			return insidePosition;
 		}
 
 		double distance = displacement.getNorm();
@@ -81,7 +81,7 @@ public class Terrain implements Renderable {
 		Vector displacement = insidePosition.subtract(outsidePosition);
 		if (doesTerrainExistAt(insidePosition)
 				&& doesTerrainExistAt(outsidePosition)) {
-			return insidePosition;
+			return outsidePosition;
 		}
 		if (!doesTerrainExistAt(insidePosition)
 				&& !doesTerrainExistAt(outsidePosition)) {
@@ -109,7 +109,7 @@ public class Terrain implements Renderable {
 	}
 
 	public Vector getSurfaceNormalVector(Vector position) {
-		return getSurfaceNormalVector(position, 10);
+		return getSurfaceNormalVector(position, 5);
 	}
 
 	public Vector getSurfaceNormalVector(Vector position, int searchDistance) {
@@ -132,6 +132,15 @@ public class Terrain implements Renderable {
 	@Override
 	public void render(Graphics2D g2) {
 		g2.drawImage(terrainImage, 0, 0, null);
+		/*for (int x = 5; x <= Constants.WIDTH - 5; x += 10){
+			Vector position = new Vector(x, getOriginalHeightValue(x));
+			Vector normal = getSurfaceNormalVector(position);
+			if (!Vector.ZERO.equals(normal)){
+				Vector fPosition = position.add(normal.setLength(10D));
+				g2.setColor(Color.RED);
+				g2.drawLine(position.getIntegerX(), position.getIntegerY(), fPosition.getIntegerX(), fPosition.getIntegerY());
+			}
+		}*/
 	}
 
 	public void reset() {

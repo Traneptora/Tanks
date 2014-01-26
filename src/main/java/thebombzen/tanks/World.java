@@ -37,6 +37,7 @@ public class World implements Runnable {
 	private boolean prevBlocked = false;
 	private boolean prevSecondBlocked = false;
 	private Map<Moving, Boolean> prevInTerrains = new HashMap<Moving, Boolean>();
+	private Map<Moving, Vector> prevPositions = new HashMap<Moving, Vector>();
 
 	private long tick = 0;
 
@@ -63,6 +64,7 @@ public class World implements Runnable {
 		if (o instanceof Moving) {
 			movingobjects.add((Moving) o);
 			prevInTerrains.put((Moving) o, ((Moving) o).calculateIfInTerrain());
+			prevPositions.put((Moving)o, ((Moving) o).getPosition());
 		}
 		if (o instanceof Renderable) {
 			renderables.add((Renderable) o);
@@ -181,6 +183,7 @@ public class World implements Runnable {
 		if (o instanceof Moving) {
 			movingobjects.remove(o);
 			prevInTerrains.remove(o);
+			prevPositions.remove(o);
 		}
 		if (o instanceof Renderable) {
 			renderables.remove(o);
@@ -205,6 +208,7 @@ public class World implements Runnable {
 		forceProviders.clear();
 		blockers.clear();
 		prevInTerrains.clear();
+		prevPositions.clear();
 		prevBlocked = false;
 		prevSecondBlocked = false;
 		tick = 0;
@@ -227,23 +231,20 @@ public class World implements Runnable {
 		Positioned[] positioneds = getAllPositionedObjects();
 		Moving[] movings = getAllMovingObjects();
 
-		Vector[] previousPositions = new Vector[movings.length];
-		for (int i = 0; i < movings.length; i++) {
-			previousPositions[i] = movings[i].getPosition();
-		}
-
 		for (Advanceable adv : advanceables) {
 			adv.advance(timestep);
 		}
 
-		boolean right = ControlPanel.getControlPanel().isRightPressed();
-		boolean left = ControlPanel.getControlPanel().isLeftPressed();
-		if (right && !left && tick % 2 == 0) {
-			Tanks.getTanks().getCurrentTank().moveRight();
-		} else if (left && !right && tick % 2 == 0) {
-			Tanks.getTanks().getCurrentTank().moveLeft();
+		if (tanks.size() > Tanks.getTanks().getTurnNumber()){
+			boolean right = ControlPanel.getControlPanel().isRightPressed();
+			boolean left = ControlPanel.getControlPanel().isLeftPressed();
+			if (right && !left && tick % 2 == 0) {
+				Tanks.getTanks().getCurrentTank().moveRight();
+			} else if (left && !right && tick % 2 == 0) {
+				Tanks.getTanks().getCurrentTank().moveLeft();
+			}
 		}
-
+		
 		for (Positioned positioned : positioneds) {
 			for (Moving moving : movings) {
 				if (positioned == moving) {
@@ -275,17 +276,24 @@ public class World implements Runnable {
 				}
 			}
 		}
+		
+		for (Moving moving : movings){
+			prevPositions.put(moving, moving.getPosition());
+		}
 
 		updateKinematics(movings, timestep);
 
 		for (int i = 0; i < movings.length; i++) {
 			boolean wasInTerrain = prevInTerrains.get(movings[i]);
 			boolean isInTerrain = movings[i].calculateIfInTerrain();
+			if (isInTerrain && !wasInTerrain){
+				movings[i].onEnterTerrain(prevPositions.get(movings[i]), movings[i].getPosition());
+			}
 			if (isInTerrain) {
-				movings[i].onEnterTerrain(previousPositions[i],
+				movings[i].onTickInTerrain(prevPositions.get(movings[i]),
 						movings[i].getPosition());
 			} else if (!isInTerrain && wasInTerrain) {
-				movings[i].onLeaveTerrain(previousPositions[i],
+				movings[i].onLeaveTerrain(prevPositions.get(movings[i]),
 						movings[i].getPosition());
 			}
 			prevInTerrains.put(movings[i], isInTerrain);

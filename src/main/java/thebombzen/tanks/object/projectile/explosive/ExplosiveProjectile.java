@@ -29,7 +29,7 @@ public class ExplosiveProjectile extends Projectile {
 	@Override
 	public void destroy() {
 		World.getWorld().addObject(
-				new Explosion(getPosition(), getMass() * radiusMultiplier, 1D,
+				new Explosion(getPosition(), getMass() * radiusMultiplier, 0.75D,
 						new Color(0xFF8000)));
 	}
 
@@ -40,6 +40,11 @@ public class ExplosiveProjectile extends Projectile {
 
 	@Override
 	public void onEnterTerrain(Vector oldPosition, Vector newPosition) {
+		destroyAndKill();
+	}
+	
+	@Override
+	public void onTickInTerrain(Vector oldPosition, Vector newPosition){
 		destroyAndKill();
 	}
 
