@@ -11,7 +11,11 @@ public class TimedExplosiveProjectile extends ExplosiveProjectile {
 
 	public TimedExplosiveProjectile(Vector position, Vector velocity,
 			double mass) {
-		super(position, velocity, mass);
+		this(position, velocity, mass, 32.5D);
+	}
+	
+	protected TimedExplosiveProjectile(Vector position, Vector velocity, double mass, double radiusMultiplier){
+		super(position, velocity, mass, radiusMultiplier);
 		if (Terrain.getTerrain().doesTerrainExistAt(position)) {
 			setFrozen(true);
 		}
@@ -25,6 +29,11 @@ public class TimedExplosiveProjectile extends ExplosiveProjectile {
 		}
 	}
 
+	@Override
+	public double getRadiusMultiplier(){
+		return radiusMultiplier;
+	}
+	
 	@Override
 	public boolean isBlocking(){
 		return true;

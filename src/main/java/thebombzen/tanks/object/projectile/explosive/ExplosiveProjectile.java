@@ -25,8 +25,12 @@ public class ExplosiveProjectile extends Projectile {
 	@Override
 	public void destroy() {
 		World.getWorld().addObject(
-				new Explosion(getPosition(), getMass() * radiusMultiplier, 0.75D,
+				new Explosion(getPosition(), getMass() * getRadiusMultiplier(), 0.75D,
 						new Color(0xFF8000)));
+	}
+	
+	protected double getRadiusMultiplier(){
+		return radiusMultiplier * getVelocity().getNorm() * 4E-3D;
 	}
 
 	@Override

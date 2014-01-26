@@ -27,6 +27,7 @@ import javax.swing.event.ChangeListener;
 import thebombzen.tanks.object.Portal;
 import thebombzen.tanks.object.Tank;
 import thebombzen.tanks.object.Terrain;
+import thebombzen.tanks.object.projectile.DeltaForced;
 import thebombzen.tanks.object.projectile.Projectile;
 import thebombzen.tanks.object.projectile.explosive.AntiPortalProjectile;
 import thebombzen.tanks.object.projectile.explosive.DeltaForcedProjectile;
@@ -292,8 +293,8 @@ public class ControlPanel extends JPanel {
 			}
 		}
 		if (readyToDeltaForce
-				&& mostRecentlyFiredProjectile instanceof DeltaForcedProjectile) {
-			((DeltaForcedProjectile) mostRecentlyFiredProjectile).deltaForce();
+				&& mostRecentlyFiredProjectile instanceof DeltaForced) {
+			((DeltaForced) mostRecentlyFiredProjectile).deltaForce();
 			readyToDeltaForce = false;
 			statusLabel.setText("Ammo successfully delta-forced.");
 		}
@@ -341,7 +342,7 @@ public class ControlPanel extends JPanel {
 			break;
 		case 2:
 			projectile = new DeltaForcedProjectile(position, velocity, mass);
-			statusLabel.setText("Click to delta-force the ammo.");
+			statusLabel.setText("Click to delta-force the projectile.");
 			readyToDeltaForce = true;
 			break;
 		case 3:

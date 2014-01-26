@@ -21,5 +21,10 @@ public class LandMineProjectile extends ExplosiveProjectile {
 	public void onLeaveTerrain(Vector oldPosition, Vector newPosition) {
 		destroyAndKill();
 	}
+	
+	@Override
+	public double getRadiusMultiplier(){
+		return radiusMultiplier;
+	}
 
 }

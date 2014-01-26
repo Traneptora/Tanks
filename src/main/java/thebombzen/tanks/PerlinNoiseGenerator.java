@@ -11,9 +11,20 @@ public class PerlinNoiseGenerator {
 	private double[][] smoothedValues = new double[OCTAVES][];
 	private double[] unsmoothedFinalValues = new double[Constants.WIDTH + 1];
 
-	private double cosineInterpolate(double a, double b, double x) {
+	/*private double cosineInterpolate(double a, double b, double x) {
 		double f = (1 - Math.cos(Math.PI * x)) * 0.5D;
 		return a * (1 - f) + b * f;
+	}*/
+	
+	private double cubicInterpolate(double v0, double v1, double v2, double v3, double x){
+		double p = (v3 - v2) - (v0 - v1);
+		double q = (v0 - v1) - p;
+		double r = v2 - v0;
+		double s = v1;
+		
+		double x2 = x * x;
+		
+		return p * x2 * x + q * x2 + r * x + s;
 	}
 
 	public int[] generateNoise(Random random,
@@ -53,9 +64,11 @@ public class PerlinNoiseGenerator {
 	private double interpolate(int octave, double x) {
 		int integerX = (int) x;
 		double fractionalX = x - integerX;
-		double v1 = smoothedValues[octave][integerX];
-		double v2 = smoothedValues[octave][integerX + 1];
-		return cosineInterpolate(v1, v2, fractionalX);
+		double v0 = smoothedValues[octave][integerX];
+		double v1 = smoothedValues[octave][integerX + 1];
+		double v2 = smoothedValues[octave][integerX + 2];
+		double v3 = smoothedValues[octave][integerX + 3];
+		return cubicInterpolate(v0, v1, v2, v3, fractionalX);
 	}
 
 	private void populateSmoothedValues(Random random) {
