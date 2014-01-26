@@ -1,5 +1,7 @@
 package thebombzen.tanks;
 
+import java.awt.Shape;
+import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +11,8 @@ import thebombzen.tanks.forceprovider.ForceProvider;
 import thebombzen.tanks.object.Explosion;
 import thebombzen.tanks.object.Portal;
 import thebombzen.tanks.object.Tank;
+import thebombzen.tanks.object.Terrain;
+import thebombzen.tanks.object.projectile.DebrisProjectile;
 import thebombzen.tanks.object.projectile.Projectile;
 import thebombzen.tanks.object.property.Advanceable;
 import thebombzen.tanks.object.property.Blocker;
@@ -38,10 +42,11 @@ public class World implements Runnable {
 	private boolean prevSecondBlocked = false;
 	private Map<Moving, Boolean> prevInTerrains = new HashMap<Moving, Boolean>();
 	private Map<Moving, Vector> prevPositions = new HashMap<Moving, Vector>();
+	private Map<Moving, Shape> prevShapes = new HashMap<Moving, Shape>();
 
 	private long tick = 0;
 
-	public void addObject(Object o) {
+	public synchronized void addObject(Object o) {
 		if (o instanceof Explosion) {
 			explosions.add((Explosion) o);
 			explode((Explosion) o);
@@ -63,8 +68,9 @@ public class World implements Runnable {
 		}
 		if (o instanceof Moving) {
 			movingobjects.add((Moving) o);
-			prevInTerrains.put((Moving) o, ((Moving) o).calculateIfInTerrain());
+			prevInTerrains.put((Moving) o, Terrain.getTerrain().isInsideTerrain(((Moving)o).getBoundingShape()));
 			prevPositions.put((Moving)o, ((Moving) o).getPosition());
+			prevShapes.put((Moving)o, ((Moving)o).getBoundingShape());
 		}
 		if (o instanceof Renderable) {
 			renderables.add((Renderable) o);
@@ -79,72 +85,63 @@ public class World implements Runnable {
 
 	private void explode(Explosion explosion) {
 		explosion.advance(Constants.TICK_TIME_STEP);
-		/*
-		 * Vector normal = Terrain.getTerrain().getSurfaceNormalVector(
-		 * explosion.getPosition()); double minAngle; double maxAngle; if
-		 * (normal.getX() == 0 && normal.getY() == 0) { minAngle = 0F; maxAngle
-		 * = Constants.TWO_PI; } else { double ang = normal.getAngle(); minAngle
-		 * = ang - Constants.PI_4; maxAngle = ang + Constants.PI_4; } for
-		 * (double angle = minAngle; angle <= maxAngle; angle += (Tanks.random
-		 * .nextDouble() + 1F) (maxAngle - minAngle) 6.5F /
-		 * explosion.getRadius()) {
-		 * 
-		 * Vector pair = Vector.polarToCartesian(1.0, angle);
-		 * 
-		 * double variationX = (10D + 2.5D * (Tanks.random.nextDouble() +
-		 * Tanks.random .nextDouble())); double variationY = (10D + 2.5D *
-		 * (Tanks.random.nextDouble() + Tanks.random .nextDouble())); Vector
-		 * position = new Vector(pair.getX() * variationX +
-		 * explosion.getPosition().getX(), pair.getY() * variationY +
-		 * explosion.getPosition().getY()); variationX = (3D + 0.75D *
-		 * (Tanks.random.nextDouble() + Tanks.random .nextDouble())); variationY
-		 * = (3D + 0.75D * (Tanks.random.nextDouble() + Tanks.random
-		 * .nextDouble())); double radius = explosion.getRadius(); Vector
-		 * velocity = new Vector(pair.getX() * radius * variationX, pair.getY()
-		 * * radius * variationY); if (explosion instanceof NoFriendlyFire) {
-		 * addObject(new SafeDebrisProjectile(position, velocity, 5.0D,
-		 * ((NoFriendlyFire) explosion).getParentTank())); } else {
-		 * addObject(new DebrisProjectile(position, velocity, 5.0D)); } }
-		 */
+		double minAngle;
+		double maxAngle;
+		Vector normal = Terrain.getTerrain().getSurfaceNormalVector(explosion.getPosition());
+		if (normal.equals(Vector.ZERO)){
+			minAngle = 0D;
+			maxAngle = Math.PI * 2D;
+		} else {
+			double angle = normal.getAngle();
+			minAngle = angle - Math.PI / 4D;
+			maxAngle = angle + Math.PI / 4D;
+		}
+		for (double angle = minAngle; angle <= maxAngle; angle += (maxAngle - minAngle) * (Tanks.random.nextDouble() * 0.15D + 0.125D)){
+			double x = Math.cos(angle) * (Tanks.random.nextDouble() * 10D + 10D);
+			double y = Math.sin(angle) * (Tanks.random.nextDouble() * 10D + 10D);
+			double vx = Math.cos(angle) * (Tanks.random.nextDouble() * 100D + 50D);
+			double vy = Math.sin(angle) * (Tanks.random.nextDouble() * 100D + 50D);
+			addObject(new DebrisProjectile(explosion.getPosition().add(new Vector(x, y)), new Vector(vx, vy), 1E10));
+		}
 	}
 
-	public Advanceable[] getAllAdvanceables() {
+	public synchronized Advanceable[] getAllAdvanceables() {
 		return advanceables.toArray(new Advanceable[0]);
 	}
 
-	public Blocker[] getAllBlockers() {
+	public synchronized Blocker[] getAllBlockers() {
 		return blockers.toArray(new Blocker[0]);
 	}
 
-	public Explosion[] getAllExplosions() {
+	public synchronized Explosion[] getAllExplosions() {
 		return explosions.toArray(new Explosion[0]);
 	}
 
-	public ForceProvider[] getAllForceProviders() {
+	public synchronized ForceProvider[] getAllForceProviders() {
 		return forceProviders.toArray(new ForceProvider[0]);
 	}
 
-	public Moving[] getAllMovingObjects() {
+	public synchronized Moving[] getAllMovingObjects() {
 		return movingobjects.toArray(new Moving[0]);
 	}
 
-	public Portal[] getAllPortals() {
+	public synchronized Portal[] getAllPortals() {
 		return portals.toArray(new Portal[0]);
 	}
 
-	public Positioned[] getAllPositionedObjects() {
+	public synchronized Positioned[] getAllPositionedObjects() {
 		return positionedobjects.toArray(new Positioned[0]);
 	}
 
-	public Projectile[] getAllProjectiles() {
+	public synchronized Projectile[] getAllProjectiles() {
 		return projectiles.toArray(new Projectile[0]);
 	}
 
-	public Renderable[] getAllRenderables() {
+	public synchronized Renderable[] getAllRenderables() {
 		return renderables.toArray(new Renderable[0]);
 	}
 
-	public Tank[] getAllTanks() {
+	public synchronized Tank[] getAllTanks() {
 		return tanks.toArray(new Tank[0]);
 	}
 
@@ -157,16 +154,27 @@ public class World implements Runnable {
 		return force;
 	}
 
-	public void markBlocked() {
-		prevBlocked = true;
+	private boolean intersects(Positioned p1, Positioned p2){
+		Area a1 = new Area(p1.getBoundingShape());
+		a1.intersect(new Area(p2.getBoundingShape()));
+		return !a1.isEmpty();
 	}
 
-	public void removeObject(Object o) {
+	public synchronized void markBlocked() {
+		prevBlocked = true;
+		prevSecondBlocked = true;
+	}
+
+	public synchronized void removeObject(Object o) {
 		if (o instanceof Explosion) {
 			explosions.remove(o);
 		}
 		if (o instanceof Portal) {
 			portals.remove(o);
+			if (((Portal)o).getLinkedPortal() != null){
+				((Portal)o).getLinkedPortal().setLinkedPortal(null);
+				removeObject(((Portal)o).getLinkedPortal());
+			}
 		}
 		if (o instanceof Projectile) {
 			projectiles.remove(o);
@@ -184,6 +192,7 @@ public class World implements Runnable {
 			movingobjects.remove(o);
 			prevInTerrains.remove(o);
 			prevPositions.remove(o);
+			prevShapes.remove(o);
 		}
 		if (o instanceof Renderable) {
 			renderables.remove(o);
@@ -196,7 +205,7 @@ public class World implements Runnable {
 		}
 	}
 
-	public void reset() {
+	public synchronized void reset() {
 		projectiles.clear();
 		explosions.clear();
 		portals.clear();
@@ -209,13 +218,14 @@ public class World implements Runnable {
 		blockers.clear();
 		prevInTerrains.clear();
 		prevPositions.clear();
+		prevShapes.clear();
 		prevBlocked = false;
 		prevSecondBlocked = false;
 		tick = 0;
 	}
-
+	
 	@Override
-	public void run() {
+	public synchronized void run() {
 		try {
 			tick(Constants.TICK_TIME_STEP);
 			GamePanel.getGamePanel().render();
@@ -250,10 +260,7 @@ public class World implements Runnable {
 				if (positioned == moving) {
 					continue;
 				}
-				double totalRadius = positioned.getRadius()
-						+ moving.getRadius();
-				if (positioned.getPosition().subtract(moving.getPosition())
-						.getNormSquared() <= totalRadius * totalRadius) {
+				if (intersects(positioned, moving)){
 					moving.collide(positioned);
 				}
 			}
@@ -261,17 +268,13 @@ public class World implements Runnable {
 
 		Portal[] portals = getAllPortals();
 
-		for (Moving moving : movings) {
-			for (Portal portal : portals) {
+		for (Portal portal : portals) {
+			for (Moving moving : movings) {
 				if (portal.getLinkedPortal() != null
-						&& portal != moving.getMostRecentTraveledPortal()) {
-					if (portal.getPosition().subtract(moving.getPosition())
-							.getNormSquared() <= portal.getRadius()
-							* portal.getRadius()) {
-						moving.setPosition(portal.getLinkedPortal()
-								.getPosition());
-						moving.setMostRecentTraveledPortal(portal
-								.getLinkedPortal());
+						&& portal != moving.getMostRecentlyTraveledPortal()) {
+					if (intersects(moving, portal)) {
+						moving.setPosition(portal.getLinkedPortal().getPosition());
+						moving.setMostRecentlyTraveledPortal(portal.getLinkedPortal());
 					}
 				}
 			}
@@ -284,27 +287,24 @@ public class World implements Runnable {
 		updateKinematics(movings, timestep);
 
 		for (int i = 0; i < movings.length; i++) {
+			Shape prevShape = prevShapes.get(movings[i]);
 			boolean wasInTerrain = prevInTerrains.get(movings[i]);
-			boolean isInTerrain = movings[i].calculateIfInTerrain();
+			Shape currShape = movings[i].getBoundingShape();
+			boolean isInTerrain = Terrain.getTerrain().isInsideTerrain(currShape);
 			if (isInTerrain && !wasInTerrain){
-				movings[i].onEnterTerrain(prevPositions.get(movings[i]), movings[i].getPosition());
-			}
-			if (isInTerrain) {
-				movings[i].onTickInTerrain(prevPositions.get(movings[i]),
-						movings[i].getPosition());
+				movings[i].onEnterTerrain(prevShape, currShape, prevPositions.get(movings[i]), movings[i].getPosition());
+			} else if (isInTerrain && wasInTerrain) {
+				movings[i].onTickInTerrain(prevShape, currShape, prevPositions.get(movings[i]), movings[i].getPosition());
 			} else if (!isInTerrain && wasInTerrain) {
 				movings[i].onLeaveTerrain(prevPositions.get(movings[i]),
 						movings[i].getPosition());
 			}
 			prevInTerrains.put(movings[i], isInTerrain);
+			prevShapes.put(movings[i], currShape);
 		}
 
 		for (Moving moving : movings) {
-			if (moving.getPosition().getX() < -moving.getRadius()
-					|| moving.getPosition().getX() >= Constants.WIDTH
-							+ moving.getRadius()
-					|| moving.getPosition().getY() >= Constants.HEIGHT
-							+ moving.getRadius()) {
+			if (moving.getPosition().getX() < 0 || moving.getPosition().getX() >= Constants.WIDTH || moving.getPosition().getY() >= Constants.HEIGHT){
 				moving.onMoveOffScreen();
 				moving.setDead();
 			}

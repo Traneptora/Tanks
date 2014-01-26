@@ -1,5 +1,7 @@
 package thebombzen.tanks.object.projectile.explosive;
 
+import java.awt.Shape;
+
 import thebombzen.tanks.Vector;
 import thebombzen.tanks.object.Terrain;
 
@@ -10,15 +12,8 @@ public class ShredderProjectile extends ExplosiveProjectile {
 	}
 
 	@Override
-	public void onEnterTerrain(Vector oldPosition, Vector newPosition) {
-		Terrain.getTerrain().setTerrainAroundRadius(getPosition(),
-				(int) (2D * getRadius()), false);
-	}
-	
-	@Override
-	public void onTickInTerrain(Vector oldPosition, Vector newPosition) {
-		Terrain.getTerrain().setTerrainAroundRadius(getPosition(),
-				(int) (2D * getRadius()), false);
+	public void onEnterTerrain(Shape outsideShape, Shape insideShape, Vector outsidePosition, Vector insidePosition) {
+		Terrain.getTerrain().setTerrainAroundRadius(getPosition(), 2D * getRadius(), false);
 	}
 
 }

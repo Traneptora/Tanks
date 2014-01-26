@@ -1,15 +1,34 @@
 package thebombzen.tanks.object.property;
 
+import java.awt.Shape;
+
 import thebombzen.tanks.Vector;
 
-public interface Positioned extends Renderable {
-	public Vector getPosition();
+public abstract class Positioned {
+	
+	protected Vector position;
+	protected boolean dead;
+	
+	protected Positioned(Vector position){
+		this.position = position;
+	}
+	
+	public abstract Shape getBoundingShape();
 
-	public double getRadius();
+	public Vector getPosition(){
+		return position;
+	}
 
-	public boolean isDead();
+	public boolean isDead(){
+		return dead;
+	}
 
-	public void setDead();
-
-	public void setPosition(Vector vector);
+	public void setDead(){
+		dead = true;
+	}
+	
+	public void setPosition(Vector position){
+		this.position = position;
+	}
+	
 }

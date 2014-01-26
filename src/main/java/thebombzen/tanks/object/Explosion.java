@@ -2,6 +2,8 @@ package thebombzen.tanks.object;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.geom.Ellipse2D;
 
 import thebombzen.tanks.RenderHelper;
 import thebombzen.tanks.Vector;
@@ -12,17 +14,16 @@ import thebombzen.tanks.object.property.Moving;
 import thebombzen.tanks.object.property.Positioned;
 import thebombzen.tanks.object.property.Renderable;
 
-public class Explosion implements Positioned, Renderable, Advanceable, Blocker, ForceProvider {
+public class Explosion extends Positioned implements Renderable, Advanceable, Blocker, ForceProvider {
 
 	private Color color;
 	private double elapsedTime = 0;
 	private double maxRadius;
 	private double totalTime;
-	private Vector position;
-	private boolean dead = false;
 
 	public Explosion(Vector position, double maxRadius, double totalTime,
 			Color color) {
+		super(position);
 		this.color = color;
 		this.position = position;
 		this.maxRadius = maxRadius;
@@ -39,26 +40,47 @@ public class Explosion implements Positioned, Renderable, Advanceable, Blocker, 
 		}
 	}
 
+	public double getAdjustedTimeFraction(){
+		return Math.pow(getTimeFraction(), 0.75D);
+	}
+
+	@Override
+	public Shape getBoundingShape() {
+		double radius = getRadius();
+		return new Ellipse2D.Double(position.getX() - radius, position.getY() - radius, radius * 2D, radius * 2D);
+	}
+
 	public Color getColor() {
 		return color;
+	}
+	
+	@Override
+	public Vector getForce(Moving moving){
+		double shockwaveRadius = Math.pow(getTimeFraction(), 1.5D) * getMaxRadius() * 10D;
+		Vector displacement = moving.getPosition().subtract(getPosition());
+		double normSquared = displacement.getNormSquared();
+		Vector force = Vector.ZERO;
+		if (normSquared > shockwaveRadius * shockwaveRadius){
+			double distanceToWave = Math.max(10D, Math.sqrt(normSquared) - shockwaveRadius);
+			double relativeStrength = 1E6D / (distanceToWave);
+			force = force.add(displacement.setLength(relativeStrength * relativeStrength / shockwaveRadius));
+		}
+		double radius = getRadius();
+		if (normSquared < radius * radius){
+			double distanceToExplosion = Math.max(5D, radius - Math.sqrt(normSquared));
+			double relativeStrength = (1D - getAdjustedTimeFraction()) * distanceToExplosion * 1E7D;
+			force = force.add(displacement.setLength(relativeStrength));
+		}
+		
+		return force;
 	}
 
 	public double getMaxRadius() {
 		return maxRadius;
 	}
 
-	@Override
-	public Vector getPosition() {
-		return position;
-	}
-
-	@Override
 	public double getRadius() {
 		return getAdjustedTimeFraction() * getMaxRadius();
-	}
-	
-	public double getAdjustedTimeFraction(){
-		return Math.pow(getTimeFraction(), 0.75D);
 	}
 
 	@Override
@@ -76,42 +98,12 @@ public class Explosion implements Positioned, Renderable, Advanceable, Blocker, 
 	}
 
 	@Override
-	public boolean isDead() {
-		return dead;
-	}
-
-	@Override
 	public void render(Graphics2D g2) {
 		RenderHelper.drawCircle(g2, getPosition(), (int)getRadius(), getColor());
 		g2.setColor(getColor());
 		double sRadius = 10D * Math.pow(getTimeFraction(), 1.5D) * getMaxRadius();
 		g2.setColor(new Color(0, 0, 0, (int)(255D * (1D - getAdjustedTimeFraction()))));
 		g2.drawOval((int)(getPosition().getX() - sRadius), (int)(getPosition().getY() - sRadius), (int)(sRadius * 2D), (int)(sRadius * 2D));
-	}
-
-	@Override
-	public void setDead() {
-		dead = true;
-
-	}
-
-	@Override
-	public void setPosition(Vector position) {
-		this.position = position;
-	}
-	
-	@Override
-	public Vector getForce(Moving moving){
-		double shockwaveRadius = Math.pow(getTimeFraction(), 1.5D) * getMaxRadius() * 10D;
-		Vector displacement = moving.getPosition().subtract(getPosition());
-		double normSquared = displacement.getNormSquared();
-		if (displacement.getNormSquared() >= shockwaveRadius * shockwaveRadius){
-			return Vector.ZERO;
-		}
-		double distanceToWave = Math.max(10D, Math.abs(Math.sqrt(normSquared) - shockwaveRadius));
-		double relativeStrength = 1E6D / (distanceToWave);
-		Vector force = displacement.setLength(relativeStrength * relativeStrength / shockwaveRadius);
-		return force;
 	}
 
 }

@@ -3,6 +3,8 @@ package thebombzen.tanks.object;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.geom.Ellipse2D;
 
 import thebombzen.tanks.Constants;
 import thebombzen.tanks.ControlPanel;
@@ -12,14 +14,11 @@ import thebombzen.tanks.World;
 import thebombzen.tanks.object.projectile.Projectile;
 import thebombzen.tanks.object.property.Advanceable;
 import thebombzen.tanks.object.property.Moving;
-import thebombzen.tanks.object.property.Positioned;
 import thebombzen.tanks.object.property.Renderable;
 
-public class Tank implements Moving, Positioned, Renderable, Advanceable {
+public class Tank extends Moving implements Renderable, Advanceable {
 
 	private int playerNumber;
-	private Vector position;
-	private Vector velocity;
 
 	private Color color;
 	private double health = 100D;
@@ -28,13 +27,9 @@ public class Tank implements Moving, Positioned, Renderable, Advanceable {
 	private int firePower = 70;
 	private int selectedAmmo = 0;
 	private int selectedMass = 1;
-	private boolean dead = false;
-	private Portal mostRecentTraveledPortal = null;
-	private boolean frozen = false;
 
 	public Tank(int playerNumber, Vector position) {
-		this.position = position;
-		this.velocity = Vector.ZERO;
+		super(position, Vector.ZERO, 1E5D);
 		this.playerNumber = playerNumber;
 		if (position.getX() < Constants.WIDTH / 2) {
 			fireAngle = -Math.PI / 6D;
@@ -59,31 +54,6 @@ public class Tank implements Moving, Positioned, Renderable, Advanceable {
 		});
 	}
 
-	@Override
-	public boolean calculateIfInTerrain() {
-		return Terrain.getTerrain().doesTerrainExistAt(getPosition());
-	}
-
-	protected boolean calculateIfInTerrain0() {
-		return Terrain.getTerrain().doesTerrainExistAt(getPosition());
-	}
-
-	/**
-	 * Includes Portals, Explosions, Tanks, and other Projectiles
-	 */
-	@Override
-	public void collide(Positioned positioned) {
-		if (positioned instanceof Explosion) {
-			onImpactWithExplosion((Explosion) positioned);
-		} else if (positioned instanceof Portal) {
-			onImpactWithPortal((Portal) positioned);
-		} else if (positioned instanceof Tank) {
-			onImpactWithTank((Tank) positioned);
-		} else if (positioned instanceof Projectile) {
-			onImpactWithProjectile((Projectile) positioned);
-		}
-	}
-
 	public void damageTank(double damage) {
 		if (isDead()) {
 			return;
@@ -95,15 +65,16 @@ public class Tank implements Moving, Positioned, Renderable, Advanceable {
 		}
 	}
 
+	@Override
 	protected void destroy() {
 		World.getWorld().addObject(
 				new Explosion(getPosition(), 150D, 1D, getColor()));
 	}
 
 	@Override
-	public void destroyAndKill() {
-		destroy();
-		setDead();
+	public Shape getBoundingShape() {
+		double radius = getRadius();
+		return new Ellipse2D.Double(position.getX() - radius, position.getY() - radius, radius * 2D, radius * 2D);
 	}
 
 	public Color getColor() {
@@ -127,26 +98,10 @@ public class Tank implements Moving, Positioned, Renderable, Advanceable {
 		return 0D;
 	}
 
-	@Override
-	public double getMass() {
-		return 1E5D;
-	}
-
-	@Override
-	public Portal getMostRecentTraveledPortal() {
-		return mostRecentTraveledPortal;
-	}
-
 	public int getPlayerNumber() {
 		return playerNumber;
 	}
 
-	@Override
-	public Vector getPosition() {
-		return position;
-	}
-
-	@Override
 	public double getRadius() {
 		return 10D;
 	}
@@ -164,36 +119,30 @@ public class Tank implements Moving, Positioned, Renderable, Advanceable {
 		return selectedMass;
 	}
 
-	@Override
-	public Vector getVelocity() {
-		return velocity;
-	}
-
 	public boolean isBlocking() {
 		return false;
 	}
 
-	@Override
-	public boolean isDead() {
-		return dead;
-	}
-
-	@Override
-	public boolean isFrozen() {
-		return frozen;
-	}
-
-	private void move(int deltaX) { // either -1 or 1
-		double y = getPosition().getY();
-		while (Terrain.getTerrain().doesTerrainExistAt(
-				new Vector(getPosition().getX() + deltaX, y - 1D))) {
-			y--;
-		}
-		double slope = (y - getPosition().getY()) / deltaX;
-		if (slope > 2D || slope < -2D) {
+	private void move(double deltaX) { // either -1 or 1
+		Vector prevPosition = getPosition();
+		Shape prevShape = getBoundingShape();
+		Vector normal = Terrain.getTerrain().getNormalVectorWith(prevShape);
+		if (normal.getY() == 0){
 			return;
 		}
-		setPosition(new Vector(getPosition().getX() + deltaX, y));
+		normal = normal.multiply(Math.abs(deltaX) / Math.abs(normal.getY()));
+		double deltaY = Math.abs(normal.getX());
+		if (Math.signum(deltaX) == Math.signum(normal.getX())){
+			deltaY = 0;
+		}
+		if (deltaY > 3){
+			return;
+		}
+		Vector newPosition = getPosition().add(new Vector(deltaX, -deltaY));
+		setPosition(newPosition);
+		Shape newShape = getBoundingShape();
+		Vector finalPosition = Terrain.getTerrain().getInnerImpactLocation(prevShape, newShape, prevPosition, newPosition); 
+		setPosition(finalPosition);
 	}
 
 	public void moveLeft() {
@@ -209,33 +158,28 @@ public class Tank implements Moving, Positioned, Renderable, Advanceable {
 		}
 		move(1);
 	}
-
-	@Override
-	public void onEnterTerrain(Vector oldPosition, Vector newPosition) {
-		//setPosition(oldPosition);
-		//setFrozen(true);
-	}
 	
 	@Override
-	public void onTickInTerrain(Vector oldPosition, Vector newPosition) {
-		//Vector displacement = newPosition.subtract(oldPosition);
-		setVelocity(Vector.ZERO);
-		Vector outerLocation = Terrain.getTerrain().getOuterImpactLocation(newPosition, oldPosition);
-		setPosition(outerLocation);
+	public void onEnterTerrain(Shape outsideShape, Shape insideShape, Vector outsidePosition, Vector insidePosition) {
+		
 	}
 
+	@Override
 	protected void onImpactWithExplosion(Explosion ex) {
 		damageTank(Constants.TICK_TIME_STEP * 20D);
 	}
 
+	@Override
 	protected void onImpactWithPortal(Portal portal) {
 
 	}
 
+	@Override
 	protected void onImpactWithProjectile(Projectile projectile) {
 
 	}
 
+	@Override
 	protected void onImpactWithTank(Tank tank) {
 
 	}
@@ -248,6 +192,13 @@ public class Tank implements Moving, Positioned, Renderable, Advanceable {
 	@Override
 	public void onMoveOffScreen() {
 		destroy();
+	}
+
+	@Override
+	public void onTickInTerrain(Shape outsideShape, Shape insideShape, Vector outsidePosition, Vector insidePosition) {
+		setVelocity(Vector.ZERO);
+		Vector outerLocation = Terrain.getTerrain().getOuterImpactLocation(outsideShape, insideShape, outsidePosition, insidePosition);
+		setPosition(outerLocation);
 	}
 
 	@Override
@@ -264,7 +215,7 @@ public class Tank implements Moving, Positioned, Renderable, Advanceable {
 
 	@Override
 	public void setDead() {
-		dead = true;
+		super.setDead();
 		ControlPanel.getControlPanel().playerWon(1 - getPlayerNumber());
 	}
 
@@ -276,51 +227,12 @@ public class Tank implements Moving, Positioned, Renderable, Advanceable {
 		this.firePower = firePower;
 	}
 
-	@Override
-	public void setFrozen(boolean frozen) {
-		if (frozen) {
-			setVelocity(Vector.ZERO);
-		}
-		this.frozen = frozen;
-	}
-
-	@Override
-	public void setMass(double mass) {
-
-	}
-
-	@Override
-	public void setMostRecentTraveledPortal(Portal portal) {
-		mostRecentTraveledPortal = portal;
-	}
-
-	@Override
-	public void setPosition(Vector position) {
-		this.position = position;
-	}
-
 	public void setSelectedAmmo(int selectedAmmo) {
 		this.selectedAmmo = selectedAmmo;
 	}
 
 	public void setSelectedMass(int selectedMass) {
 		this.selectedMass = selectedMass;
-	}
-
-	@Override
-	public void setVelocity(Vector velocity) {
-		if (frozen) {
-			return;
-		}
-		this.velocity = velocity;
-	}
-
-	@Override
-	public String toString() {
-		return "Tank [getHealth()=" + getHealth() + ", getPlayerNumber()="
-				+ getPlayerNumber() + ", getFireAngle()=" + getFireAngle()
-				+ ", getPosition()=" + getPosition() + ", getVelocity()="
-				+ getVelocity() + "]";
 	}
 
 }

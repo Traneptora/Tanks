@@ -1,5 +1,7 @@
 package thebombzen.tanks.object.projectile.explosive;
 
+import java.awt.Shape;
+
 import thebombzen.tanks.Vector;
 import thebombzen.tanks.object.Terrain;
 
@@ -10,16 +12,8 @@ public class LandMineProjectile extends ExplosiveProjectile {
 	}
 
 	@Override
-	public void onEnterTerrain(Vector oldPosition, Vector newPosition) {
-		setPosition(Terrain.getTerrain().getInnerImpactLocation(newPosition,
-				oldPosition));
-		setFrozen(true);
-	}
-	
-	@Override
-	public void onTickInTerrain(Vector oldPosition, Vector newPosition) {
-		setPosition(Terrain.getTerrain().getInnerImpactLocation(newPosition,
-				oldPosition));
+	public void onEnterTerrain(Shape outsideShape, Shape insideShape, Vector outsidePosition, Vector insidePosition) {
+		setPosition(Terrain.getTerrain().getInnerImpactLocation(outsideShape, insideShape, outsidePosition, insidePosition));
 		setFrozen(true);
 	}
 

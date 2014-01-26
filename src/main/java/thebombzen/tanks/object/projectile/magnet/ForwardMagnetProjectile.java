@@ -30,12 +30,4 @@ public class ForwardMagnetProjectile extends MagnetProjectile implements
 		return force;
 	}
 
-	@Override
-	public String toString() {
-		return "MagnetProjectile [attract=" + attract + ", getPosition()="
-				+ getPosition() + ", getVelocity()=" + getVelocity()
-				+ ", isFrozen()=" + isFrozen() + ", getMass()=" + getMass()
-				+ "]";
-	}
-
 }

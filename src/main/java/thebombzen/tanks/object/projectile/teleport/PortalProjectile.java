@@ -1,5 +1,7 @@
 package thebombzen.tanks.object.projectile.teleport;
 
+import java.awt.Shape;
+
 import thebombzen.tanks.ControlPanel;
 import thebombzen.tanks.Vector;
 import thebombzen.tanks.World;
@@ -10,11 +12,6 @@ public class PortalProjectile extends Projectile {
 
 	public PortalProjectile(Vector position, Vector velocity, double mass) {
 		super(position, velocity, mass);
-	}
-
-	@Override
-	public void advance(double timestep) {
-
 	}
 
 	@Override
@@ -30,29 +27,8 @@ public class PortalProjectile extends Projectile {
 	}
 
 	@Override
-	public void onEnterTerrain(Vector oldPosition, Vector newPosition) {
+	public void onEnterTerrain(Shape outsideShape, Shape insideShape, Vector outsidePosition, Vector insidePosition) {
 		destroyAndKill();
-	}
-	
-	public void onTickInTerrain(Vector oldPosition, Vector newPosition){
-		destroyAndKill();
-	}
-
-	@Override
-	public void onLeaveTerrain(Vector oldPosition, Vector newPosition) {
-
-	}
-
-	@Override
-	public void onMoveOffScreen() {
-
-	}
-
-	@Override
-	public String toString() {
-		return "PortalProjectile [getPosition()=" + getPosition()
-				+ ", getVelocity()=" + getVelocity() + ", getMass()="
-				+ getMass() + "]";
 	}
 
 }

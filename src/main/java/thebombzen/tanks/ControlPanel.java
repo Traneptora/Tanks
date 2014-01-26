@@ -451,8 +451,14 @@ public class ControlPanel extends JPanel {
 			angleSlider.setLabelTable(backwardAngleSliderLabels);
 			statusLabel.setText("Second player's turn.");
 		}
-		double fireAngle = newTank.getFireAngle();
-		fireAngle = (-fireAngle) % Constants.PI;
+		double fireAngle = - newTank.getFireAngle();
+		while (fireAngle < 0){
+			fireAngle += Constants.PI;
+		}
+		while (fireAngle > Constants.PI){
+			fireAngle -= Constants.PI;
+		}
+		
 		angleSlider.setValue(180 - (int) (180D / Constants.PI * fireAngle));
 
 		firepowerSlider.setValue(newTank.getFirePower());

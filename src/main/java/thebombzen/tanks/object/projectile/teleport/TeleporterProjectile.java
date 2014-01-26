@@ -1,5 +1,7 @@
 package thebombzen.tanks.object.projectile.teleport;
 
+import java.awt.Shape;
+
 import thebombzen.tanks.Vector;
 import thebombzen.tanks.object.Tank;
 import thebombzen.tanks.object.Terrain;
@@ -13,11 +15,6 @@ public class TeleporterProjectile extends Projectile {
 			Tank parentTank) {
 		super(position, velocity, mass);
 		this.parentTank = parentTank;
-	}
-
-	@Override
-	public void advance(double timestep) {
-
 	}
 
 	@Override
@@ -35,33 +32,8 @@ public class TeleporterProjectile extends Projectile {
 	}
 
 	@Override
-	public void onEnterTerrain(Vector oldPosition, Vector newPosition) {
-		parentTank.setPosition(Terrain.getTerrain().getOuterImpactLocation(
-				newPosition, oldPosition));
+	public void onEnterTerrain(Shape outsideShape, Shape insideShape, Vector outsidePosition, Vector insidePosition){
+		parentTank.setPosition(Terrain.getTerrain().getOuterImpactLocation(outsideShape, insideShape, outsidePosition, insidePosition));
 		setDead();
 	}
-	
-	public void onTickInTerrain(Vector oldPosition, Vector newPosition) {
-		parentTank.setPosition(Terrain.getTerrain().getOuterImpactLocation(
-				newPosition, oldPosition));
-		setDead();
-	}
-
-	@Override
-	public void onLeaveTerrain(Vector oldPosition, Vector newPosition) {
-
-	}
-
-	@Override
-	public void onMoveOffScreen() {
-
-	}
-
-	@Override
-	public String toString() {
-		return "TeleporterProjectile [getParentTank()=" + getParentTank()
-				+ ", getPosition()=" + getPosition() + ", getVelocity()="
-				+ getVelocity() + ", getMass()=" + getMass() + "]";
-	}
-
 }

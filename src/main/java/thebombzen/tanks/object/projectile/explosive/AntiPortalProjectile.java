@@ -11,13 +11,9 @@ public class AntiPortalProjectile extends ExplosiveProjectile {
 	}
 
 	@Override
-	protected boolean onImpactWithPortal(Portal portal) {
+	protected void onImpactWithPortal(Portal portal) {
 		World.getWorld().removeObject(portal);
-		if (portal.getLinkedPortal() != null) {
-			World.getWorld().removeObject(portal.getLinkedPortal());
-		}
 		destroyAndKill();
-		return false;
 	}
 
 }

@@ -1,5 +1,7 @@
 package thebombzen.tanks.object.projectile.magnet;
 
+import java.awt.Shape;
+
 import thebombzen.tanks.Vector;
 import thebombzen.tanks.object.Terrain;
 import thebombzen.tanks.object.projectile.Projectile;
@@ -7,11 +9,6 @@ import thebombzen.tanks.object.projectile.Projectile;
 public abstract class MagnetProjectile extends Projectile {
 	protected MagnetProjectile(Vector position, Vector velocity, double mass) {
 		super(position, velocity, mass);
-	}
-
-	@Override
-	public void advance(double timestep) {
-
 	}
 
 	@Override
@@ -25,9 +22,8 @@ public abstract class MagnetProjectile extends Projectile {
 	}
 
 	@Override
-	public void onEnterTerrain(Vector oldPosition, Vector newPosition) {
-		setPosition(Terrain.getTerrain().getInnerImpactLocation(newPosition,
-				oldPosition));
+	public void onEnterTerrain(Shape outsideShape, Shape insideShape, Vector outsidePosition, Vector insidePosition) {
+		setPosition(Terrain.getTerrain().getInnerImpactLocation(outsideShape, insideShape, outsidePosition, insidePosition));
 		setFrozen(true);
 	}
 	
@@ -39,11 +35,6 @@ public abstract class MagnetProjectile extends Projectile {
 	@Override
 	public void onLeaveTerrain(Vector oldPosition, Vector newPosition) {
 		setFrozen(false);
-	}
-
-	@Override
-	public void onMoveOffScreen() {
-
 	}
 	
 	public void onTickInTerrain(Vector oldPosition, Vector newPosition){

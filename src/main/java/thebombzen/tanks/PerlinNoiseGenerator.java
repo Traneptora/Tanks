@@ -9,16 +9,18 @@ public class PerlinNoiseGenerator {
 
 	private double[][] randomValues = new double[OCTAVES][];
 	private double[][] smoothedValues = new double[OCTAVES][];
-	private double[] unsmoothedFinalValues = new double[Constants.WIDTH];
+	private double[] unsmoothedFinalValues = new double[Constants.WIDTH + 1];
 
 	private double cosineInterpolate(double a, double b, double x) {
 		double f = (1 - Math.cos(Math.PI * x)) * 0.5D;
 		return a * (1 - f) + b * f;
 	}
 
-	public int[] generateNoise(int[] finalValues, Random random,
+	public int[] generateNoise(Random random,
 			double persistence) {
 
+		int[] finalValues = new int[unsmoothedFinalValues.length];
+		
 		populateSmoothedValues(random);
 
 		Arrays.fill(unsmoothedFinalValues, 0D);
@@ -35,13 +37,13 @@ public class PerlinNoiseGenerator {
 		}
 
 		finalValues[0] = (int) unsmoothedFinalValues[0];
-		finalValues[Constants.WIDTH - 1] = (int) unsmoothedFinalValues[Constants.WIDTH - 1];
+		finalValues[Constants.WIDTH] = (int) unsmoothedFinalValues[Constants.WIDTH];
 
-		for (int i = 1; i < Constants.WIDTH - 1; i++) {
+		for (int i = 1; i < Constants.WIDTH; i++) {
 			finalValues[i] = (int) ((unsmoothedFinalValues[i - 1] + unsmoothedFinalValues[i + 1]) * 0.25D + unsmoothedFinalValues[i] * 0.5D);
 		}
 
-		for (int x = 0; x < Constants.WIDTH; x++) {
+		for (int x = 0; x < Constants.WIDTH + 1; x++) {
 			finalValues[x] = Constants.HEIGHT - finalValues[x];
 		}
 
@@ -58,7 +60,7 @@ public class PerlinNoiseGenerator {
 
 	private void populateSmoothedValues(Random random) {
 		for (int i = 0; i < OCTAVES; i++) {
-			int size = (Constants.WIDTH >> i) + 1;
+			int size = (Constants.WIDTH >> i) + 3;
 			randomValues[i] = new double[size];
 			smoothedValues[i] = new double[size];
 			for (int j = 0; j < size; j++) {

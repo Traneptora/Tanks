@@ -1,6 +1,7 @@
 package thebombzen.tanks.object.projectile.explosive;
 
 import java.awt.Color;
+import java.awt.Shape;
 
 import thebombzen.tanks.Vector;
 import thebombzen.tanks.World;
@@ -22,11 +23,6 @@ public class ExplosiveProjectile extends Projectile {
 	}
 
 	@Override
-	public void advance(double timestep) {
-
-	}
-
-	@Override
 	public void destroy() {
 		World.getWorld().addObject(
 				new Explosion(getPosition(), getMass() * radiusMultiplier, 0.75D,
@@ -39,29 +35,8 @@ public class ExplosiveProjectile extends Projectile {
 	}
 
 	@Override
-	public void onEnterTerrain(Vector oldPosition, Vector newPosition) {
+	public void onEnterTerrain(Shape outsideShape, Shape insideShape, Vector outsidePosition, Vector insidePosition) {
 		destroyAndKill();
-	}
-	
-	@Override
-	public void onTickInTerrain(Vector oldPosition, Vector newPosition){
-		destroyAndKill();
-	}
-
-	@Override
-	public void onLeaveTerrain(Vector oldPosition, Vector newPosition) {
-
-	}
-
-	@Override
-	public void onMoveOffScreen() {
-
-	}
-
-	@Override
-	public String toString() {
-		return "ExplosiveProjectile [position=" + getPosition() + ", velocity="
-				+ getVelocity() + ", getMass()=" + getMass() + "]";
 	}
 
 }

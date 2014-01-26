@@ -32,12 +32,4 @@ public class SpiralMagnetProjectile extends MagnetProjectile implements
 		return force;
 	}
 
-	@Override
-	public String toString() {
-		return "SpiralMagnetProjectile [right=" + left + ", getPosition()="
-				+ getPosition() + ", getVelocity()=" + getVelocity()
-				+ ", isFrozen()=" + isFrozen() + ", getMass()=" + getMass()
-				+ "]";
-	}
-
 }

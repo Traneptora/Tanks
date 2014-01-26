@@ -3,18 +3,18 @@ package thebombzen.tanks;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.geom.Ellipse2D;
 
 public final class RenderHelper {
 
 	private static float nextHue = -1F;
 	private static final float ONE_OVER_PHI = 0.618033988749895F;
 
-	public static void drawCircle(Graphics2D g2, Vector center, int radius,
+	public static void drawCircle(Graphics2D g2, Vector center, double radius,
 			Color color) {
-		int x = center.getIntegerX();
-		int y = center.getIntegerY();
+		Ellipse2D circle = new Ellipse2D.Double(center.getX() - radius, center.getY() - radius, radius * 2D, radius * 2D);
 		g2.setColor(color);
-		g2.fillOval(x - radius, y - radius, 2 * radius, 2 * radius);
+		g2.fill(circle);
 	}
 
 	public static Color generateRandomColor(float saturation, float value) {

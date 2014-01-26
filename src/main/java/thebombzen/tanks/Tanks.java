@@ -17,6 +17,7 @@ import javax.swing.KeyStroke;
 
 import thebombzen.tanks.forceprovider.GravitationalForceProvider;
 import thebombzen.tanks.forceprovider.WindForceProvider;
+import thebombzen.tanks.object.Portal;
 import thebombzen.tanks.object.Tank;
 import thebombzen.tanks.object.Terrain;
 
@@ -104,6 +105,9 @@ public class Tanks extends JPanel {
 
 	public void cycleTurns() {
 		turnNumber = (turnNumber + 1) % numTanks;
+		for (Portal portal : World.getWorld().getAllPortals()){
+			portal.incrementTurnsAlive();
+		}
 	}
 
 	public Tank getCurrentTank() {
@@ -150,9 +154,9 @@ public class Tanks extends JPanel {
 		world.addObject(new WindForceProvider());
 
 		world.addObject(new Tank(0, new Vector(240, terrain
-				.getOriginalHeightValue(240) - 1D)));
+				.getOriginalHeightValue(240) - 100D)));
 		world.addObject(new Tank(1, new Vector(720, terrain
-				.getOriginalHeightValue(720) - 1D)));
+				.getOriginalHeightValue(720) - 100D)));
 
 		turnNumber = 0;
 		wind = 0D;

@@ -1,5 +1,7 @@
 package thebombzen.tanks;
 
+import java.awt.geom.Point2D;
+
 /**
  * Represents a vector in Cartesian coordinates.
  * 
@@ -32,6 +34,10 @@ public class Vector {
 
 	public Vector add(Vector addend) {
 		return new Vector(x + addend.getX(), y + addend.getY());
+	}
+	
+	public Point2D asPoint2D(){
+		return new Point2D.Double(x, y);
 	}
 
 	public Vector cross(double z) {
@@ -73,7 +79,7 @@ public class Vector {
 	public Vector getComponent(Vector direction) {
 		return direction.multiply(dot(direction) / direction.getNormSquared());
 	}
-
+	
 	public int getIntegerX() {
 		return (int)Math.round(x);
 	}
@@ -97,6 +103,10 @@ public class Vector {
 
 	public double getNormSquared() {
 		return getX() * getX() + getY() * getY();
+	}
+
+	public Vector getOrthogonalComponent(Vector direction) {
+		return subtract(getComponent(direction));
 	}
 
 	public double getX() {

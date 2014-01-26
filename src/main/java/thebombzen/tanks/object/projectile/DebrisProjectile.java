@@ -1,6 +1,7 @@
 package thebombzen.tanks.object.projectile;
 
 import java.awt.Color;
+import java.awt.Shape;
 
 import thebombzen.tanks.Vector;
 import thebombzen.tanks.object.Tank;
@@ -10,11 +11,6 @@ public class DebrisProjectile extends Projectile {
 
 	public DebrisProjectile(Vector position, Vector velocity, double mass) {
 		super(position, velocity, mass);
-	}
-
-	@Override
-	public void advance(double timestep) {
-
 	}
 
 	@Override
@@ -38,7 +34,7 @@ public class DebrisProjectile extends Projectile {
 	}
 
 	@Override
-	public void onEnterTerrain(Vector oldPosition, Vector newPosition) {
+	public void onEnterTerrain(Shape outsideShape, Shape insideShape, Vector outsidePosition, Vector insidePosition) {
 		setDead();
 	}
 
@@ -48,28 +44,8 @@ public class DebrisProjectile extends Projectile {
 				&& ((NoFriendlyFire) this).getParentTank() == tank) {
 			return;
 		}
-		tank.damageTank(5D);
-	}
-
-	@Override
-	public void onLeaveTerrain(Vector oldPosition, Vector newPosition) {
-
-	}
-
-	@Override
-	public void onMoveOffScreen() {
-
-	}
-
-	@Override
-	public String toString() {
-		return "DebrisProjectile [getPosition()=" + getPosition()
-				+ ", getVelocity()=" + getVelocity() + ", getMass()="
-				+ getMass() + "]";
-	}
-	
-	public void onTickInTerrain(Vector oldPosition, Vector newPosition) {
-		destroyAndKill();
+		tank.damageTank(2D);
+		setDead();
 	}
 
 }
