@@ -1,0 +1,14 @@
+LINUX / OSX / SOLARIS / *nix
+===========================
+Navigate to the root directory and run
+make
+That's it! To clean the compiled files run
+make clean
+
+WINDOWS
+===========
+Navigate to the root directory and run
+make.bat
+That's it! To clean the compiled files run
+make.bat clean
+
