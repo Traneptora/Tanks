@@ -1,14 +1,4 @@
-LINUX / OSX / SOLARIS / *nix
-===========================
-Navigate to the root directory and run
-make
-That's it! To clean the compiled files run
-make clean
-
-WINDOWS
-===========
-Navigate to the root directory and run
-make.bat
-That's it! To clean the compiled files run
-make.bat clean
+Tanks is released in the Public Domain. You may use it for any reason,
+for any purpose (including commerical purposes), without even asking,
+to the full extent permitted by law in your jurisdiction.
 
