@@ -32,9 +32,9 @@ public class Tank extends Moving implements Renderable, Advanceable {
 		super(position, Vector.ZERO, 1E5D);
 		this.playerNumber = playerNumber;
 		if (position.getX() < Constants.WIDTH / 2) {
-			fireAngle = -Math.PI / 6D;
+			fireAngle = - Constants.PI / 6D;
 		} else {
-			fireAngle = -Math.PI * (5D / 6D);
+			fireAngle = - Constants.PI * (5D / 6D);
 		}
 		if (playerNumber == 0) {
 			color = Color.BLUE;

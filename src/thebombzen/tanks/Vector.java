@@ -3,7 +3,7 @@ package thebombzen.tanks;
 import java.awt.geom.Point2D;
 
 /**
- * Represents a vector in Cartesian coordinates.
+ * Represents a two-dimensional vector in Cartesian coordinates.
  * 
  */
 public class Vector {
@@ -23,13 +23,17 @@ public class Vector {
 	public static Vector polarToCartesian(double r, double theta) {
 		return new Vector(r * Math.cos(theta), r * Math.sin(theta));
 	}
-
+	
 	private final double x;
 	private final double y;
 
 	public Vector(double x, double y) {
 		this.x = x;
 		this.y = y;
+	}
+	
+	public Vector(Point2D point2D){
+		this(point2D.getX(), point2D.getY());
 	}
 
 	public Vector add(Vector addend) {
@@ -40,10 +44,16 @@ public class Vector {
 		return new Point2D.Double(x, y);
 	}
 
+	/**
+	 * Two-dimensional projection of (x, y, 0) * (0, 0, z) (which is always in the xy plane.)
+	 */
 	public Vector cross(double z) {
 		return new Vector(y, -x).multiply(z);
 	}
 
+	/**
+	 * z-component of the cross product of (x, y, 0) and (other.x, other.y, 0).
+	 */
 	public double cross(Vector vector) {
 		return getX() * vector.getY() - getY() * vector.getX();
 	}
@@ -73,6 +83,9 @@ public class Vector {
 	}
 
 	public double getAngle() {
+		if (isZero()){
+			return 0D;
+		}
 		return Math.atan2(getY(), getX());
 	}
 
@@ -93,7 +106,11 @@ public class Vector {
 	}
 
 	public double getNorm() {
-		return 1D / getInverseNorm();
+		if (isZero()){
+			return 0D;
+		} else {
+			return 1D / getInverseNorm();
+		}
 	}
 
 	public double getNormCubed() {
@@ -138,10 +155,16 @@ public class Vector {
 	}
 
 	public Vector normalize() {
+		if (isZero()){
+			return this;
+		}
 		return multiply(getInverseNorm());
 	}
 
 	public Vector setLength(double length) {
+		if (isZero()){
+			return this;
+		}
 		return multiply(getInverseNorm() * length);
 	}
 
@@ -152,6 +175,10 @@ public class Vector {
 	@Override
 	public String toString() {
 		return String.format("Vector [x=%.3f, y=%.3f]", x, y);
+	}
+	
+	public boolean isZero(){
+		return equals(Vector.ZERO);
 	}
 
 }

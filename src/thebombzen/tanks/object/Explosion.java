@@ -56,7 +56,7 @@ public class Explosion extends Positioned implements Renderable, Advanceable, Bl
 	
 	@Override
 	public Vector getForce(Moving moving){
-		double shockwaveRadius = Math.pow(getTimeFraction(), 1.5D) * getMaxRadius() * 10D;
+		double shockwaveRadius = getShockwaveRadius();
 		Vector displacement = moving.getPosition().subtract(getPosition());
 		double normSquared = displacement.getNormSquared();
 		Vector force = Vector.ZERO;
@@ -96,12 +96,15 @@ public class Explosion extends Positioned implements Renderable, Advanceable, Bl
 	public boolean isBlocking() {
 		return true;
 	}
+	
+	public double getShockwaveRadius(){
+		return 10D * Math.pow(getTimeFraction(), 1.5D) * getMaxRadius();
+	}
 
 	@Override
 	public void render(Graphics2D g2) {
 		RenderHelper.drawCircle(g2, getPosition(), (int)getRadius(), getColor());
-		g2.setColor(getColor());
-		double sRadius = 10D * Math.pow(getTimeFraction(), 1.5D) * getMaxRadius();
+		double sRadius = getShockwaveRadius();
 		g2.setColor(new Color(0, 0, 0, (int)(255D * (1D - getAdjustedTimeFraction()))));
 		g2.drawOval((int)(getPosition().getX() - sRadius), (int)(getPosition().getY() - sRadius), (int)(sRadius * 2D), (int)(sRadius * 2D));
 	}

@@ -1,6 +1,5 @@
 package thebombzen.tanks;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -20,7 +19,9 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JSeparator;
 import javax.swing.JSlider;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -51,8 +52,7 @@ public class ControlPanel extends JPanel {
 		return controlPanel;
 	}
 
-	private JPanel affp = new JPanel(); // angle firepower fire panel
-	private JComboBox<String> ammoSelectionBox = new JComboBox<String>();
+	private JComboBox<String> ammoSelectionComboBox = new JComboBox<String>();
 	private JLabel angleLabel = new JLabel("Select Angle: 30");
 	private JSlider angleSlider = new JSlider(JSlider.HORIZONTAL, 0, 180, 150);
 	private Hashtable<Integer, JLabel> backwardAngleSliderLabels = new Hashtable<Integer, JLabel>();
@@ -64,7 +64,6 @@ public class ControlPanel extends JPanel {
 	private JSlider firepowerSlider = new JSlider(JSlider.HORIZONTAL, 0, 100,
 			70);
 	private Hashtable<Integer, JLabel> forwardAngleSliderLabels = new Hashtable<Integer, JLabel>();
-	private JPanel healthPanel = new JPanel(new GridLayout(2, 2, 5, 5));
 
 	private volatile boolean leftPressed = false;
 	private volatile boolean lockdown = false;
@@ -73,15 +72,12 @@ public class ControlPanel extends JPanel {
 	private Portal mostRecentlyFiredPortal = null;
 	private Projectile mostRecentlyFiredProjectile = null;
 
-	private JPanel movePanel = new JPanel();
-
 	private JButton resetButton = new JButton("Reset");
 	private volatile boolean rightPressed = false;
 
 	private JLabel statusLabel = new JLabel("First player's turn.");
 
 	private JProgressBar[] tankHealthBars;
-	private JPanel wap = new JPanel(); // wind ammo panel
 
 	private JLabel windLabel = new JLabel();
 
@@ -94,12 +90,18 @@ public class ControlPanel extends JPanel {
 		tankHealthBars[1] = new JProgressBar(0, 100);
 
 		setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		add(Box.createVerticalStrut(5));
+		
+		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+		
+		this.add(Box.createHorizontalStrut(10));
+		
+		Box content = Box.createVerticalBox();
+		content.add(Box.createVerticalStrut(10));
 
-		affp.setLayout(new BoxLayout(affp, BoxLayout.X_AXIS));
-		angleSlider.setMaximumSize(new Dimension(465, angleSlider
-				.getPreferredSize().height));
+		Box angleFireBox = Box.createHorizontalBox();
+		
+		//angleSlider.setMaximumSize(new Dimension(465, angleSlider
+		//		.getPreferredSize().height));
 		angleSlider.setMajorTickSpacing(30);
 		angleSlider.setMinorTickSpacing(10);
 		angleSlider.setFocusable(false);
@@ -125,19 +127,22 @@ public class ControlPanel extends JPanel {
 			}
 		});
 		componentsToDisable.add(angleSlider);
-		JPanel angleLabelPanel = new JPanel(new BorderLayout());
-		angleLabelPanel.add(angleLabel);
-		JPanel anglePanel = new JPanel();
-		anglePanel.setLayout(new BoxLayout(anglePanel, BoxLayout.Y_AXIS));
-		anglePanel.add(angleLabelPanel);
-		anglePanel.add(Box.createVerticalGlue());
-		anglePanel.add(angleSlider);
-		affp.add(anglePanel);
-		affp.add(Box.createHorizontalStrut(10));
+		
+		Box angleLabelBox = Box.createHorizontalBox();
+		angleLabelBox.add(angleLabel);
+		angleLabelBox.add(Box.createHorizontalGlue());
+		
+		Box angleBox = Box.createVerticalBox();
+		angleBox.add(angleLabelBox);
+		angleBox.add(Box.createVerticalGlue());
+		angleBox.add(angleSlider);
+		
+		angleFireBox.add(angleBox);
+		angleFireBox.add(Box.createHorizontalStrut(10));
 
-		firepowerSlider.setFocusable(false);
-		firepowerSlider.setMaximumSize(new Dimension(465, firepowerSlider
-				.getPreferredSize().height));
+		//firepowerSlider.setFocusable(false);
+		//firepowerSlider.setMaximumSize(new Dimension(465, firepowerSlider
+		//		.getPreferredSize().height));
 		firepowerSlider.setMajorTickSpacing(20);
 		firepowerSlider.setMinorTickSpacing(5);
 		firepowerSlider.setPaintLabels(true);
@@ -149,25 +154,30 @@ public class ControlPanel extends JPanel {
 			}
 		});
 		componentsToDisable.add(firepowerSlider);
-		JPanel firepowerLabelPanel = new JPanel(new BorderLayout());
-		firepowerLabelPanel.add(firepowerLabel);
-		JPanel firepowerPanel = new JPanel();
-		firepowerPanel
-				.setLayout(new BoxLayout(firepowerPanel, BoxLayout.Y_AXIS));
-		firepowerPanel.add(firepowerLabelPanel);
-		firepowerPanel.add(Box.createVerticalGlue());
-		firepowerPanel.add(firepowerSlider);
-		affp.add(firepowerPanel);
+		
+		Box firepowerLabelBox = Box.createHorizontalBox();
+		firepowerLabelBox.add(firepowerLabel);
+		firepowerLabelBox.add(Box.createHorizontalGlue());
+		
+		Box firepowerBox = Box.createVerticalBox();
+		firepowerBox.add(firepowerLabelBox);
+		firepowerBox.add(Box.createVerticalGlue());
+		firepowerBox.add(firepowerSlider);
+		
+		angleFireBox.add(firepowerBox);
 
-		affp.setMaximumSize(new Dimension(940, affp.getPreferredSize().height));
-		add(affp);
-		add(Box.createVerticalGlue());
+		content.add(angleFireBox);
+		
+		content.add(Box.createVerticalStrut(5));
+		content.add(new JSeparator(SwingConstants.HORIZONTAL));
+		content.add(Box.createVerticalStrut(5));
 
 		setWindLabelText();
 
-		wap.setLayout(new BoxLayout(wap, BoxLayout.X_AXIS));
-		wap.add(windLabel);
-		wap.add(Box.createHorizontalGlue());
+		Box windAmmoBox = Box.createHorizontalBox();
+		
+		windAmmoBox.add(windLabel);
+		windAmmoBox.add(Box.createHorizontalGlue());
 
 		DefaultComboBoxModel<String> massBoxModel = new DefaultComboBoxModel<String>();
 		massBoxModel.addElement("Light");
@@ -176,24 +186,27 @@ public class ControlPanel extends JPanel {
 		massSelectionBox.setModel(massBoxModel);
 		massSelectionBox.setSelectedIndex(1);
 		massSelectionBox.setFocusable(false);
-
-		JPanel massPanel = new JPanel();
-		massPanel.setLayout(new BoxLayout(massPanel, BoxLayout.Y_AXIS));
-		JLabel weightLabel = new JLabel("Select Ammo Weight:");
-		JPanel weightLabelPanel = new JPanel(new BorderLayout());
-		weightLabelPanel.add(weightLabel);
-		massPanel.add(weightLabelPanel);
-		massPanel.add(Box.createVerticalStrut(5));
-		massPanel.add(massSelectionBox);
-		massPanel.setMaximumSize(new Dimension(200, massPanel
-				.getPreferredSize().height));
-		massPanel.setPreferredSize(massPanel.getMaximumSize());
-		wap.add(massPanel);
-		wap.add(Box.createHorizontalStrut(10));
-
 		componentsToDisable.add(massSelectionBox);
 
+		Box massBox = Box.createVerticalBox();
+		
+		JLabel massLabel = new JLabel("Select Ammo Mass:");
+		Box massLabelBox = Box.createHorizontalBox();
+		massLabelBox.add(massLabel);
+		massLabelBox.add(Box.createHorizontalGlue());
+		
+		massBox.add(massLabelBox);
+		massBox.add(Box.createVerticalStrut(5));
+		massBox.add(massSelectionBox);
+		//massPanel.setMaximumSize(new Dimension(200, massPanel
+		//		.getPreferredSize().height));
+		//massPanel.setPreferredSize(massPanel.getMaximumSize());
+		
+		windAmmoBox.add(massBox);
+		windAmmoBox.add(Box.createHorizontalStrut(10));
+
 		DefaultComboBoxModel<String> ammoBoxModel = new DefaultComboBoxModel<String>();
+		
 		ammoBoxModel.addElement("Basic Explosive");
 		ammoBoxModel.addElement("Timed Explosive");
 		ammoBoxModel.addElement("Delta-forced Explosive");
@@ -209,28 +222,31 @@ public class ControlPanel extends JPanel {
 		ammoBoxModel.addElement("Teleporter");
 		ammoBoxModel.addElement("Portal");
 
-		ammoSelectionBox.setModel(ammoBoxModel);
-		ammoSelectionBox.setSelectedIndex(0);
-		ammoSelectionBox.setMaximumRowCount(14);
-		ammoSelectionBox.setFocusable(false);
+		ammoSelectionComboBox.setModel(ammoBoxModel);
+		ammoSelectionComboBox.setSelectedIndex(0);
+		ammoSelectionComboBox.setMaximumRowCount(ammoBoxModel.getSize());
+		ammoSelectionComboBox.setFocusable(false);
 
-		JPanel ammoPanel = new JPanel();
-		ammoPanel.setLayout(new BoxLayout(ammoPanel, BoxLayout.Y_AXIS));
+		Box ammoBox = Box.createVerticalBox();
+		
 		JLabel ammoLabel = new JLabel("Select Ammo Type:");
-		JPanel ammoLabelPanel = new JPanel(new BorderLayout());
-		ammoLabelPanel.add(ammoLabel);
-		ammoPanel.add(ammoLabelPanel);
-		ammoPanel.add(Box.createVerticalStrut(5));
-		ammoPanel.add(ammoSelectionBox);
-		ammoPanel.setMaximumSize(new Dimension(200, ammoPanel
-				.getPreferredSize().height));
-		ammoPanel.setPreferredSize(ammoPanel.getMaximumSize());
-		wap.add(ammoPanel);
-		wap.add(Box.createHorizontalStrut(10));
+		Box ammoLabelBox = Box.createHorizontalBox();
+		ammoLabelBox.add(ammoLabel);
+		ammoLabelBox.add(Box.createHorizontalGlue());
+		
+		ammoBox.add(ammoLabelBox);
+		
+		ammoBox.add(Box.createVerticalStrut(5));
+		ammoBox.add(ammoSelectionComboBox);
+		//ammoPanel.setMaximumSize(new Dimension(200, ammoPanel
+		//		.getPreferredSize().height));
+		//ammoPanel.setPreferredSize(ammoPanel.getMaximumSize());
+		windAmmoBox.add(ammoBox);
+		windAmmoBox.add(Box.createHorizontalStrut(10));
 
-		fireButton.setMaximumSize(new Dimension(100, ammoPanel
-				.getPreferredSize().height));
-		fireButton.setPreferredSize(fireButton.getMaximumSize());
+		//fireButton.setMaximumSize(new Dimension(100, ammoPanel
+		//		.getPreferredSize().height));
+		//fireButton.setPreferredSize(fireButton.getMaximumSize());
 
 		fireButton.addActionListener(new ActionListener() {
 			@Override
@@ -239,12 +255,15 @@ public class ControlPanel extends JPanel {
 			}
 		});
 
+		JPanel fireButtonPanel = new JPanel();
+		fireButtonPanel.setLayout(new GridLayout());
 		componentsToDisable.add(fireButton);
-		wap.add(fireButton);
+		fireButtonPanel.add(fireButton);
+		windAmmoBox.add(fireButtonPanel);
 
-		wap.add(Box.createHorizontalGlue());
+		windAmmoBox.add(Box.createHorizontalGlue());
 
-		componentsToDisable.add(ammoSelectionBox);
+		componentsToDisable.add(ammoSelectionComboBox);
 
 		resetButton.addActionListener(new ActionListener() {
 			@Override
@@ -253,25 +272,54 @@ public class ControlPanel extends JPanel {
 			}
 		});
 
-		wap.add(resetButton);
+		windAmmoBox.add(resetButton);
 
-		wap.setMaximumSize(new Dimension(940, wap.getPreferredSize().height));
+		//wap.setMaximumSize(new Dimension(940, wap.getPreferredSize().height));
 
-		add(wap);
-		add(Box.createVerticalGlue());
+		content.add(windAmmoBox);
+		content.add(Box.createVerticalStrut(5));
+		content.add(new JSeparator(SwingConstants.HORIZONTAL));
+		content.add(Box.createVerticalStrut(5));
 
-		healthPanel.add(new JLabel("First player's health"));
-		healthPanel.add(new JLabel("Second player's health"));
-		healthPanel.add(tankHealthBars[0]);
-		healthPanel.add(tankHealthBars[1]);
-		healthPanel.setMaximumSize(new Dimension(940, healthPanel
-				.getPreferredSize().height));
-		add(healthPanel);
-		add(Box.createVerticalGlue());
+		Box healthBox = Box.createHorizontalBox();
+		
+		Box firstPlayerHealthBox = Box.createVerticalBox();
+		Box firstPlayerHealthLabelBox = Box.createHorizontalBox();
+		firstPlayerHealthLabelBox.add(new JLabel("First player's health"));
+		firstPlayerHealthLabelBox.add(Box.createHorizontalGlue());
+		firstPlayerHealthBox.add(firstPlayerHealthLabelBox);
+		firstPlayerHealthBox.add(Box.createVerticalStrut(5));
+		firstPlayerHealthBox.add(tankHealthBars[0]);
+		
+		healthBox.add(firstPlayerHealthBox);
+		healthBox.add(Box.createHorizontalStrut(10));
+		
+		Box secondPlayerHealthBox = Box.createVerticalBox();
+		Box secondPlayerHealthLabelBox = Box.createHorizontalBox();
+		secondPlayerHealthLabelBox.add(new JLabel("Second player's health"));
+		secondPlayerHealthLabelBox.add(Box.createHorizontalGlue());
+		secondPlayerHealthBox.add(secondPlayerHealthLabelBox);
+		secondPlayerHealthBox.add(Box.createVerticalStrut(5));
+		secondPlayerHealthBox.add(tankHealthBars[1]);
+		healthBox.add(secondPlayerHealthBox);
+		
+		//healthPanel.setMaximumSize(new Dimension(940, healthPanel
+		//		.getPreferredSize().height));
+		content.add(healthBox);
+		content.add(Box.createVerticalStrut(10));
 
-		movePanel.setPreferredSize(new Dimension(940, 20));
-		movePanel.add(statusLabel);
-		add(movePanel);
+		Box whoseMoveBox = Box.createHorizontalBox();
+		whoseMoveBox.add(Box.createHorizontalGlue());
+		whoseMoveBox.add(statusLabel);
+		whoseMoveBox.add(Box.createHorizontalGlue());
+		
+		//movePanel.setPreferredSize(new Dimension(940, 20));
+		content.add(whoseMoveBox);
+		content.add(Box.createVerticalStrut(10));
+		
+		add(content);
+		add(Box.createHorizontalStrut(10));
+		
 	}
 
 	private void angleSliderChanged() {
@@ -305,7 +353,7 @@ public class ControlPanel extends JPanel {
 		lock();
 
 		Tank tank = Tanks.getTanks().getCurrentTank();
-		tank.setSelectedAmmo(ammoSelectionBox.getSelectedIndex());
+		tank.setSelectedAmmo(ammoSelectionComboBox.getSelectedIndex());
 		tank.setSelectedMass(massSelectionBox.getSelectedIndex());
 		tank.setFirePower(firepowerSlider.getValue());
 
@@ -333,7 +381,7 @@ public class ControlPanel extends JPanel {
 
 		Projectile projectile;
 
-		switch (ammoSelectionBox.getSelectedIndex()) {
+		switch (ammoSelectionComboBox.getSelectedIndex()) {
 		case 0:
 			projectile = new ExplosiveProjectile(position, velocity, mass);
 			break;
@@ -464,7 +512,7 @@ public class ControlPanel extends JPanel {
 
 		firepowerSlider.setValue(newTank.getFirePower());
 		massSelectionBox.setSelectedIndex(newTank.getSelectedMass());
-		ammoSelectionBox.setSelectedIndex(newTank.getSelectedAmmo());
+		ammoSelectionComboBox.setSelectedIndex(newTank.getSelectedAmmo());
 		Tanks.getTanks().randomizeWind();
 		setWindLabelText();
 		unlock();
@@ -478,7 +526,7 @@ public class ControlPanel extends JPanel {
 		firepowerSlider.setValue(70);
 		setWindLabelText();
 		massSelectionBox.setSelectedIndex(1);
-		ammoSelectionBox.setSelectedIndex(0);
+		ammoSelectionComboBox.setSelectedIndex(0);
 		angleSliderChanged();
 		firepowerSliderChanged();
 		statusLabel.setText("First player's turn.");

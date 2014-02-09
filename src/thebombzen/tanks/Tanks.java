@@ -1,6 +1,5 @@
 package thebombzen.tanks;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -10,6 +9,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.AbstractAction;
+import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -33,10 +33,18 @@ public class Tanks extends JPanel {
 
 	public static void main(String[] args) {
 		JFrame tanksFrame = new JFrame();
-		BorderLayout layout = new BorderLayout();
-		tanksFrame.setLayout(layout);
-		tanksFrame.add(new Tanks());
+		Box superBox = Box.createHorizontalBox();
+		superBox.add(Box.createHorizontalStrut(5));
+		Box contentBox = Box.createVerticalBox();
+		contentBox.add(Box.createVerticalStrut(5));
+		contentBox.add(new Tanks());
+		contentBox.add(Box.createVerticalStrut(5));
+		superBox.add(contentBox);
+		superBox.add(Box.createHorizontalStrut(5));
+		
+		tanksFrame.add(superBox);
 		tanksFrame.pack();
+		
 		tanksFrame.setResizable(false);
 		tanksFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		tanksFrame.setTitle("Tanks");
@@ -44,6 +52,7 @@ public class Tanks extends JPanel {
 		tanksFrame.setLocation((screenSize.width - tanksFrame.getWidth()) / 2,
 				(screenSize.height - tanksFrame.getHeight()) / 2);
 		tanksFrame.setVisible(true);
+		GamePanel.getGamePanel().requestFocusInWindow();
 		tanks.resetAndInit();
 		tanks.start();
 	}
@@ -55,12 +64,12 @@ public class Tanks extends JPanel {
 
 	public Tanks() {
 		tanks = this;
-		BorderLayout layout = new BorderLayout();
-		setLayout(new BorderLayout());
-		layout.setHgap(0);
-		layout.setVgap(0);
-		add(ControlPanel.getControlPanel(), BorderLayout.NORTH);
-		add(GamePanel.getGamePanel(), BorderLayout.CENTER);
+		Box contentBox = Box.createVerticalBox();
+		contentBox.add(ControlPanel.getControlPanel());
+		contentBox.add(Box.createVerticalStrut(10));
+		contentBox.add(GamePanel.getGamePanel());
+		add(contentBox);
+		
 		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
 				KeyStroke.getKeyStroke("RIGHT"), "rightPressed");
 		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(

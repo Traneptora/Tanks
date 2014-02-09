@@ -88,13 +88,13 @@ public class World implements Runnable {
 		double minAngle;
 		double maxAngle;
 		Vector normal = Terrain.getTerrain().getSurfaceNormalVector(explosion.getPosition());
-		if (normal.equals(Vector.ZERO)){
+		if (normal.isZero()){
 			minAngle = 0D;
-			maxAngle = Math.PI * 2D;
+			maxAngle = Constants.TWO_PI;
 		} else {
 			double angle = normal.getAngle();
-			minAngle = angle - Math.PI / 4D;
-			maxAngle = angle + Math.PI / 4D;
+			minAngle = angle - Constants.PI_4;
+			maxAngle = angle + Constants.PI_4;
 		}
 		for (double angle = minAngle; angle <= maxAngle; angle += (maxAngle - minAngle) * (Tanks.random.nextDouble() * 0.15D + 0.125D)){
 			double x = Math.cos(angle) * (Tanks.random.nextDouble() * 10D + 10D);

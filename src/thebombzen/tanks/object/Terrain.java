@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.Polygon;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
@@ -173,7 +174,7 @@ public class Terrain implements Renderable {
 	public Vector getInnerImpactLocation(Shape outsideShape, Shape insideShape,
 			Vector outsidePosition, Vector insidePosition) {
 		Vector displacement = insidePosition.subtract(outsidePosition);
-		if (displacement.equals(Vector.ZERO)) {
+		if (displacement.isZero()) {
 			return insidePosition;
 		}
 		double distance = displacement.getNorm();
@@ -223,7 +224,7 @@ public class Terrain implements Renderable {
 	
 	public Vector getOuterImpactLocation(Shape outsideShape, Shape insideShape, Vector outsidePosition, Vector insidePosition){
 		Vector displacement = insidePosition.subtract(outsidePosition);
-		if (displacement.equals(Vector.ZERO)){
+		if (displacement.isZero()){
 			return insidePosition;
 		}
 		double distance = displacement.getNorm();
@@ -300,6 +301,7 @@ public class Terrain implements Renderable {
 
 	@Override
 	public void render(Graphics2D g2) {
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 		g2.drawImage(terrainImage, 0, 0, null);
 	}
 
