@@ -5,7 +5,7 @@ Tanks.jar: build/thebombzen/tanks/Tanks.class
 
 build/thebombzen/tanks/Tanks.class:
 	mkdir -p build/
-	javac -source 1.6 -target 1.6 -deprecation -sourcepath src/main/java -d build/ -implicit:class -g:none src/main/java/thebombzen/tanks/Tanks.java
+	javac -source 1.6 -target 1.6 -deprecation -sourcepath src/ -d build/ -implicit:class -g:none src/main/java/thebombzen/tanks/Tanks.java
 
 clean: 
 	rm -rf build/
